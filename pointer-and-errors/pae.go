@@ -1,15 +1,20 @@
 package pae
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
+
+var ErrInsufficientFunds = errors.New("cannot withdrawl, insufficient funds.")
 
 type Bitcoin float64
 
-type Wallet struct {
-	balance Bitcoin
-}
-
 func (b Bitcoin) String() string {
 	return fmt.Sprintf("%g BTC", b)
+}
+
+type Wallet struct {
+	balance Bitcoin
 }
 
 func (w *Wallet) Deposit(amount Bitcoin) {
@@ -20,10 +25,10 @@ func (w *Wallet) Balance() Bitcoin {
 	return w.balance
 }
 
-func (w *Wallet) Withdrawl(amount Bitcoin) Bitcoin {
-	if amount > w.balance {
-		panic("withdrew past balance")
+func (w *Wallet) Withdrawl(amount Bitcoin) error {
+	if amount > w.Balance() {
+		return ErrInsufficientFunds
 	}
 	w.balance -= amount
-	return amount
+	return nil
 }
